@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShortLink - Fast URL Shortener</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="favicon.ico" sizes="16x16" />
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -19,7 +22,7 @@
                 <input type="url" id="originalUrl" placeholder="Paste your long URL here..." required>
                 <button id="shortenBtn" onclick="shortenUrl()">Shorten</button>
             </div>
-            
+
             <div id="result" class="result-container hidden">
                 <p>Your rounded URL:</p>
                 <div class="short-url-box">
@@ -37,4 +40,5 @@
     </div>
     <script src="script.js"></script>
 </body>
+
 </html>
