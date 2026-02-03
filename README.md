@@ -1,4 +1,4 @@
-# ShortLink (Astral Sagan)
+# URL Shortener
 
 A simple, fast, and secure URL shortener service built with Node.js, Express, and SQLite.
 
