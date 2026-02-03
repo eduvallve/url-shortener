@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShortLink - Fast URL Shortener</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ShortLink</h1>
+            <p>Shorten your links, expand your reach.</p>
+        </header>
+
+        <main>
+            <div class="input-group">
+                <input type="url" id="originalUrl" placeholder="Paste your long URL here..." required>
+                <button id="shortenBtn" onclick="shortenUrl()">Shorten</button>
+            </div>
+            
+            <div id="result" class="result-container hidden">
+                <p>Your rounded URL:</p>
+                <div class="short-url-box">
+                    <a href="#" id="shortLink" target="_blank"></a>
+                    <button class="copy-btn" onclick="copyToClipboard()">Copy</button>
+                </div>
+            </div>
+
+            <div id="error" class="error-message hidden"></div>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 ShortLink. Simple & Secure.</p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
