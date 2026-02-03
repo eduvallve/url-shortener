@@ -55,6 +55,7 @@ header p {
     display: flex;
     gap: 10px;
     margin-bottom: 1.5rem;
+    flex-wrap: wrap;
 }
 
 input[type="url"] {
