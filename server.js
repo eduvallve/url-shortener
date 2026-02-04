@@ -11,6 +11,15 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Validate environment variables
+if (!process.env.TURSO_DATABASE_URL || !process.env.TURSO_AUTH_TOKEN) {
+    console.error('ERROR: Missing required environment variables!');
+    console.error('Required: TURSO_DATABASE_URL, TURSO_AUTH_TOKEN');
+    if (process.env.NODE_ENV === 'production') {
+        throw new Error('Missing Turso environment variables. Please configure them in Vercel dashboard.');
+    }
+}
+
 // Database Setup - Turso
 const db = createClient({
     url: process.env.TURSO_DATABASE_URL,
