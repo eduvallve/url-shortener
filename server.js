@@ -17,8 +17,13 @@ const db = createClient({
     authToken: process.env.TURSO_AUTH_TOKEN
 });
 
-// Initialize database table
-async function createTable() {
+// Database initialization flag
+let dbInitialized = false;
+
+// Initialize database table (lazy initialization)
+async function ensureTableExists() {
+    if (dbInitialized) return;
+
     try {
         await db.execute(`CREATE TABLE IF NOT EXISTS urls (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -26,14 +31,14 @@ async function createTable() {
             code TEXT NOT NULL UNIQUE,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )`);
+        dbInitialized = true;
         console.log('urls table ready.');
     } catch (err) {
         console.error('Error creating table:', err.message);
+        throw err;
     }
 }
 
-// Initialize the table on startup
-createTable();
 
 // Helper to generate a short code
 function generateCode(length = 6) {
@@ -71,6 +76,9 @@ app.post('/api/shorten', async (req, res) => {
     }
 
     try {
+        // Ensure database table exists
+        await ensureTableExists();
+
         // Check if URL has already been shortened
         const existingRow = await checkExistingUrl(originalUrl);
 
@@ -106,6 +114,9 @@ app.get('/:code', async (req, res) => {
     const { code } = req.params;
 
     try {
+        // Ensure database table exists
+        await ensureTableExists();
+
         const result = await db.execute({
             sql: 'SELECT original_url FROM urls WHERE code = ?',
             args: [code]
