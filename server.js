@@ -126,8 +126,14 @@ app.get('/:code', async (req, res) => {
     }
 });
 
-// Start Server
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log('Connected to Turso database');
-});
+// Start Server (only for local development)
+if (process.env.NODE_ENV !== 'production') {
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+        console.log('Connected to Turso database');
+    });
+}
+
+// Export for Vercel serverless
+module.exports = app;
