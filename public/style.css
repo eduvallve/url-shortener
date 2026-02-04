@@ -56,6 +56,7 @@ header p {
     gap: 10px;
     margin-bottom: 1.5rem;
     flex-wrap: wrap;
+    justify-content: center;
 }
 
 input[type="url"] {

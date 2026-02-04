@@ -1,40 +1,39 @@
+require('dotenv').config();
 const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
+const { createClient } = require('@libsql/client');
 const path = require('path');
 const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const DB_PATH = path.join(__dirname, 'urls.db');
 
 // Middleware
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Database Setup
-const db = new sqlite3.Database(DB_PATH, (err) => {
-    if (err) {
-        console.error('Error opening database:', err.message);
-    } else {
-        console.log('Connected to the SQLite database.');
-        createTable();
-    }
+// Database Setup - Turso
+const db = createClient({
+    url: process.env.TURSO_DATABASE_URL,
+    authToken: process.env.TURSO_AUTH_TOKEN
 });
 
-function createTable() {
-    db.run(`CREATE TABLE IF NOT EXISTS urls (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        original_url TEXT NOT NULL,
-        code TEXT NOT NULL UNIQUE,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`, (err) => {
-        if (err) {
-            console.error('Error creating table:', err.message);
-        } else {
-            console.log('urls table ready.');
-        }
-    });
+// Initialize database table
+async function createTable() {
+    try {
+        await db.execute(`CREATE TABLE IF NOT EXISTS urls (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            original_url TEXT NOT NULL,
+            code TEXT NOT NULL UNIQUE,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )`);
+        console.log('urls table ready.');
+    } catch (err) {
+        console.error('Error creating table:', err.message);
+    }
 }
+
+// Initialize the table on startup
+createTable();
 
 // Helper to generate a short code
 function generateCode(length = 6) {
@@ -43,8 +42,21 @@ function generateCode(length = 6) {
 
 // Routes
 
+// Helper to check if URL already exists
+async function checkExistingUrl(originalUrl) {
+    try {
+        const result = await db.execute({
+            sql: 'SELECT code FROM urls WHERE original_url = ?',
+            args: [originalUrl]
+        });
+        return result.rows.length > 0 ? result.rows[0] : null;
+    } catch (err) {
+        throw err;
+    }
+}
+
 // Shorten URL
-app.post('/api/shorten', (req, res) => {
+app.post('/api/shorten', async (req, res) => {
     const { originalUrl } = req.body;
 
     if (!originalUrl) {
@@ -58,37 +70,49 @@ app.post('/api/shorten', (req, res) => {
         return res.status(400).json({ error: 'Invalid URL format' });
     }
 
-    const code = generateCode();
+    try {
+        // Check if URL has already been shortened
+        const existingRow = await checkExistingUrl(originalUrl);
 
-    // In a production app, we should check for code collision/uniqueness,
-    // but with 6 base64 chars, it's rare for small scale. 
-    // We'll trust the unique constraint to throw error if very unlucky, or just retry one time.
-
-    const stmt = db.prepare('INSERT INTO urls (original_url, code) VALUES (?, ?)');
-    stmt.run(originalUrl, code, function (err) {
-        if (err) {
-            console.error('Error inserting URL:', err.message);
-            return res.status(500).json({ error: 'Database error' });
+        // If URL already exists, return the existing short URL
+        if (existingRow) {
+            const shortUrl = `${req.protocol}://${req.get('host')}/${existingRow.code}`;
+            return res.json({
+                originalUrl,
+                code: existingRow.code,
+                shortUrl,
+                existing: true // Flag to indicate this was already shortened
+            });
         }
 
+        // URL doesn't exist, create a new short URL
+        const code = generateCode();
+
+        await db.execute({
+            sql: 'INSERT INTO urls (original_url, code) VALUES (?, ?)',
+            args: [originalUrl, code]
+        });
+
         const shortUrl = `${req.protocol}://${req.get('host')}/${code}`;
-        res.json({ originalUrl, code, shortUrl });
-    });
-    stmt.finalize();
+        res.json({ originalUrl, code, shortUrl, existing: false });
+    } catch (err) {
+        console.error('Error processing URL:', err.message);
+        return res.status(500).json({ error: 'Database error' });
+    }
 });
 
 // Redirect
-app.get('/:code', (req, res) => {
+app.get('/:code', async (req, res) => {
     const { code } = req.params;
 
-    db.get('SELECT original_url FROM urls WHERE code = ?', [code], (err, row) => {
-        if (err) {
-            console.error('Error querying database:', err.message);
-            return res.status(500).send('Database error');
-        }
+    try {
+        const result = await db.execute({
+            sql: 'SELECT original_url FROM urls WHERE code = ?',
+            args: [code]
+        });
 
-        if (row) {
-            res.redirect(row.original_url);
+        if (result.rows.length > 0) {
+            res.redirect(result.rows[0].original_url);
         } else {
             // Check if it's a static file request that missed static middleware or just 404
             // Since static is strictly checking public folder, this is likely an invalid short code.
@@ -96,10 +120,14 @@ app.get('/:code', (req, res) => {
                 if (err) res.status(404).send('URL not found');
             });
         }
-    });
+    } catch (err) {
+        console.error('Error querying database:', err.message);
+        return res.status(500).send('Database error');
+    }
 });
 
 // Start Server
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+    console.log('Connected to Turso database');
 });

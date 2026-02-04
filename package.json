@@ -12,7 +12,8 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "express": "^5.2.1",
-    "sqlite3": "^5.1.7"
+    "@libsql/client": "^0.14.0",
+    "dotenv": "^16.4.7",
+    "express": "^5.2.1"
   }
 }
