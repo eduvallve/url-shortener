@@ -26,8 +26,8 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    padding: 16px;
+    min-height: 100dvh;
+    padding: 0 16px;
     margin: 0;
 }
 
@@ -61,7 +61,6 @@ header p {
     display: flex;
     gap: 10px;
     margin-bottom: 1.5rem;
-    /* flex-wrap: wrap; */
     justify-content: center;
     flex-direction: column;
 }
@@ -181,7 +180,6 @@ footer {
 
 details {
     font-size: 12px;
-    /* padding: .5em 0; */
 }
 
 a {
