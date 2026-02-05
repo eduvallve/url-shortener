@@ -49,6 +49,7 @@ header h1 {
     margin-bottom: 0.5rem;
     background: linear-gradient(135deg, #4f46e5, #ec4899);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -184,4 +185,56 @@ details {
 
 a {
     color: inherit;
+}
+
+.report-container {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background-color: #fff1f2;
+    border-radius: 8px;
+    border: 1px solid #fecaca;
+    text-align: left;
+}
+
+.report-container hr {
+    border: 0;
+    border-top: 1px solid #fecaca;
+    margin-bottom: 1rem;
+}
+
+.report-container p {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #991b1b;
+    margin-bottom: 0.5rem;
+}
+
+.report-box {
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+}
+
+@media screen and (min-width: 600px) {
+    .report-box {
+        flex-direction: row;
+    }
+}
+
+.report-box input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    font-size: 0.875rem;
+}
+
+.report-box button {
+    padding: 8px 16px;
+    font-size: 0.875rem;
+    background-color: #ef4444;
+}
+
+.report-box button:hover {
+    background-color: #dc2626;
 }

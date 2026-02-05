@@ -41,11 +41,54 @@ async function shortenUrl() {
         edurl.textContent = data.shortUrl;
         resultContainer.classList.remove('hidden');
 
+        // Show report section
+        document.getElementById('report-section').classList.remove('hidden');
+        document.getElementById('report-section').dataset.code = data.code;
+
     } catch (err) {
         showError(err.message);
     } finally {
         shortenBtn.disabled = false;
         shortenBtn.textContent = 'Shorten';
+    }
+}
+
+async function submitReport() {
+    const reportSection = document.getElementById('report-section');
+    const code = reportSection.dataset.code;
+    const reasonInput = document.getElementById('reportReason');
+    const reason = reasonInput.value.trim();
+
+    console.log(code, reason);
+
+    if (!reason) {
+        alert('Please provide a reason for the report.');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/report', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ code, reason })
+        });
+
+        const data = await response.json();
+
+        console.log(data);
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Failed to submit report');
+        }
+
+        alert('Thank you for your report. We will review it shortly.');
+        reasonInput.value = '';
+        reportSection.classList.add('hidden');
+
+    } catch (err) {
+        alert('Error: ' + err.message);
     }
 }
 

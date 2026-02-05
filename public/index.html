@@ -45,6 +45,15 @@
                     <p>Total clicks: <span id="totalClicks"></span></p>
                 </div>
             </div>
+
+            <div id="report-section" class="report-container hidden">
+                <hr>
+                <p>Report Abuse:</p>
+                <div class="report-box">
+                    <input type="text" id="reportReason" placeholder="Reason (e.g., phishing, malware)...">
+                    <button onclick="submitReport()">Submit Report</button>
+                </div>
+            </div>
         </main>
     </div>
     <div id="policies">
@@ -52,16 +61,25 @@
         <details>
             <summary>Privacy Policy</summary>
             <p>We do not store any personal data. The only stored data is the shortened URLs and their
-                statistics.</p>
+                statistics. We do not use cookies for tracking.</p>
         </details>
         <details>
             <summary>Terms of Service</summary>
             <ul>
-                <li>We use <a target="_blank" rel="noopener noreferrer" href="https://turso.io">Turso</a> as our
+                <li>We use <a target="_blank" rel="noopener noreferrer" href="https://turso.tech">Turso</a> as our
                     database provider.</li>
                 <li><b>edurl</b> is a free service provided by <a target="_blank" rel="noopener noreferrer"
                         href="https://eduvallve.com">Eduard
                         Vallvé</a>.</li>
+                <li><b>Prohibited Content</b>: Users are strictly prohibited from shortening URLs that lead to:
+                    <ul>
+                        <li>Phishing or scam websites</li>
+                        <li>Malware or viruses</li>
+                        <li>Hate speech or harassment</li>
+                        <li>Illegal content of any kind</li>
+                    </ul>
+                </li>
+                <li>We reserve the right to remove any shortened URL that violates these terms without notice.</li>
                 <li>We are not responsible for the content of the shortened URLs.</li>
             </ul>
         </details>
