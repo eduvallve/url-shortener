@@ -7,6 +7,8 @@
     --text-muted: #6b7280;
     --border-color: #e5e7eb;
     --error-color: #ef4444;
+    --success-color: #10b981;
+    --success-color-hover: #059669;
     --content-width: 600px;
 }
 
@@ -151,6 +153,18 @@ button:active {
     font-size: 0.875rem;
 }
 
+.success .copy-btn {
+    background-color: var(--success-color);
+}
+
+.success .copy-btn:hover {
+    background-color: var(--success-color-hover);
+}
+
+.success a {
+    color: var(--success-color);
+}
+
 .hidden {
     display: none;
 }
@@ -207,6 +221,7 @@ a {
     font-weight: 600;
     color: #991b1b;
     margin-bottom: 0.5rem;
+    margin-top: 0;
 }
 
 .report-box {

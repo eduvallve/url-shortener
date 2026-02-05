@@ -25,14 +25,14 @@
         <main>
             <div class="input-group">
                 <input type="url" id="originalUrl" placeholder="Paste your long URL here..." required>
-                <button id="shortenBtn" onclick="shortenUrl()">Shorten</button>
+                <button id="shortenBtn">Shorten</button>
             </div>
 
             <div id="result" class="result-container hidden">
                 <p>Your rounded URL:</p>
                 <div class="short-url-box">
                     <a href="#" id="edurl" target="_blank"></a>
-                    <button class="copy-btn" onclick="copyToClipboard()">Copy</button>
+                    <button class="copy-btn">Copy</button>
                 </div>
             </div>
 
@@ -47,11 +47,10 @@
             </div>
 
             <div id="report-section" class="report-container hidden">
-                <hr>
                 <p>Report Abuse:</p>
                 <div class="report-box">
                     <input type="text" id="reportReason" placeholder="Reason (e.g., phishing, malware)...">
-                    <button onclick="submitReport()">Submit Report</button>
+                    <button id="submitReportBtn">Submit Report</button>
                 </div>
             </div>
         </main>

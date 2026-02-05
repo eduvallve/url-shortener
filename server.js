@@ -84,6 +84,9 @@ async function ensureTableExists() {
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )`);
 
+        // Optimization: Add index for faster duplicate checks
+        await db.execute(`CREATE INDEX IF NOT EXISTS idx_original_url ON urls(original_url)`);
+
         urlsTableInitialised = true;
 
         await db.execute(`CREATE TABLE IF NOT EXISTS reports (
@@ -273,12 +276,11 @@ app.post('/api/report', async (req, res) => {
     }
 });
 
-// Redirect 
-app.get('/:code', /* redirectLimiter,*/ async (req, res) => {
+// Redirect Check Logic
+app.get('/:code', redirectLimiter, async (req, res) => {
     const { code } = req.params;
 
     try {
-        // Ensure database table exists
         await ensureTableExists();
 
         const result = await db.execute({
@@ -286,69 +288,69 @@ app.get('/:code', /* redirectLimiter,*/ async (req, res) => {
             args: [code]
         });
 
-        if (result.rows.length > 0) {
-            const targetUrl = result.rows[0].original_url;
-
-            // Security Header: Prevent referrer leakage during redirect
-            res.setHeader('Referrer-Policy', 'no-referrer');
-
-            // Redirect Warning for external domains
-            // Fix: Use strict Host comparison instead of .includes()
-            let targetHost;
-            try {
-                targetHost = new URL(targetUrl).hostname;
-            } catch (e) {
-                targetHost = '';
-            }
-
-            const isExternal = !TRUSTED_HOSTS.includes(targetHost);
-            const confirmed = req.query.confirmed === '1';
-
-            if (isExternal && !confirmed) {
-                // Return a simple warning page
-                return res.send(`
-                    <!DOCTYPE html>
-                    <html lang="en">
-                    <head>
-                        <meta charset="UTF-8">
-                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <title>Security Warning - EdUrl</title>
-                        <style>
-                            body { font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f9fafb; color: #111827; }
-                            .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); max-width: 400px; text-align: center; }
-                            h1 { font-size: 1.5rem; margin-bottom: 1rem; color: #ef4444; }
-                            p { margin-bottom: 1.5rem; line-height: 1.5; color: #4b5563; word-break: break-all; }
-                            .btn { display: inline-block; padding: 0.75rem 1.5rem; background: #6366f1; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: background 0.2s; }
-                            .btn:hover { background: #4f46e5; }
-                            .cancel { display: block; margin-top: 1rem; color: #6b7280; text-decoration: none; font-size: 0.875rem; }
-                        </style>
-                    </head>
-                    <body>
-                        <div class="card">
-                            <h1>Security Warning</h1>
-                            <p>You are about to be redirected to an external site:<br><strong>${validator.escape(targetUrl)}</strong></p>
-                            <p>Only proceed if you trust this link.</p>
-                            <a href="/${code}?confirmed=1" class="btn">Proceed to Site</a>
-                            <a href="/" class="cancel">Go Back</a>
-                        </div>
-                    </body>
-                    </html>
-                `);
-            }
-
-            res.redirect(targetUrl);
-        } else {
-            // Check if it's a static file request that missed static middleware or just 404
-            // Since static is strictly checking public folder, this is likely an invalid short code.
-            res.status(404).sendFile(path.join(__dirname, 'public', '404.html'), (err) => {
+        if (result.rows.length === 0) {
+            return res.status(404).sendFile(path.join(__dirname, 'public', '404.html'), (err) => {
                 if (err) res.status(404).send('URL not found');
             });
         }
+
+        const targetUrl = result.rows[0].original_url;
+
+        // Security Header: Prevent referrer leakage during redirect
+        res.setHeader('Referrer-Policy', 'no-referrer');
+
+        // Optimization: Use a quick check for reports
+        const reports = await db.execute({
+            sql: 'SELECT 1 FROM reports WHERE url_code = ? LIMIT 1',
+            args: [code]
+        });
+
+        if (reports.rows.length > 0) {
+            return res.send(generateWarningPage(targetUrl, code));
+        }
+
+        res.redirect(targetUrl);
     } catch (err) {
         console.error('Error querying database:', err.message);
         return res.status(500).send('Database error');
     }
 });
+
+/**
+ * Generates a security warning page for external redirects
+ */
+function generateWarningPage(targetUrl, code) {
+    const escapedUrl = validator.escape(targetUrl);
+    return `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>EdUrl - Security Warning</title>
+            <style>
+                body { font-family: 'Inter', system-ui, -apple-system, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f9fafb; color: #111827; }
+                .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); max-width: 400px; text-align: center; border: 1px solid #e5e7eb; }
+                h1 { font-size: 1.5rem; margin-top: 0; margin-bottom: 1rem; color: #ef4444; }
+                p { margin-bottom: 1.5rem; line-height: 1.6; color: #4b5563; word-break: break-all; }
+                .btn { display: inline-block; padding: 0.75rem 1.5rem; background: #6366f1; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: background 0.2s; }
+                .btn:hover { background: #4f46e5; }
+                .cancel { display: block; margin-top: 1rem; color: #6b7280; text-decoration: none; font-size: 0.875rem; }
+                .cancel:hover { text-decoration: underline; }
+            </style>
+        </head>
+        <body>
+            <div class="card">
+                <h1>Security Warning</h1>
+                <p>You are about to be redirected to a site<br>that has been <b>reported</b> for malicious activity:<br><b>${escapedUrl}</b></p>
+                <p>Only proceed if you trust this link.</p>
+                <a href="${targetUrl}" class="btn">Proceed to Site</a>
+                <a href="/" class="cancel">Go Back to EdUrl</a>
+            </div>
+        </body>
+        </html>
+    `;
+}
 
 // Start Server (only for local development)
 if (process.env.NODE_ENV !== 'production') {
