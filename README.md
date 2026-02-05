@@ -1,4 +1,4 @@
-# EdUrl: Lighten URL Shortener
+# EdUrl: easy URL Shortener
 
 A simple, fast, and secure URL shortener service built with Node.js, Express, and Turso (cloud SQLite). Created by [Eduard Vallvé](https://eduvallve.com).
 
