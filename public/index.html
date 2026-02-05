@@ -4,16 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShortLink - Fast URL Shortener</title>
+    <title>EdUrl: lighten URL shortener</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/png" href="favicon.ico" sizes="16x16" />
+    <link rel="icon" type="image/png" href="favicon/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="favicon/favicon.svg" />
+    <link rel="shortcut icon" href="favicon/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="EdURL" />
+    <link rel="manifest" href="favicon/site.webmanifest" />
 </head>
 
 <body>
     <div class="container">
         <header>
-            <h1>ShortLink</h1>
+            <h1>EdUrl: <small>lighten URL shortener</small></h1>
             <p>Shorten your links, expand your reach.</p>
         </header>
 
@@ -26,17 +31,45 @@
             <div id="result" class="result-container hidden">
                 <p>Your rounded URL:</p>
                 <div class="short-url-box">
-                    <a href="#" id="shortLink" target="_blank"></a>
+                    <a href="#" id="edurl" target="_blank"></a>
                     <button class="copy-btn" onclick="copyToClipboard()">Copy</button>
                 </div>
             </div>
 
             <div id="error" class="error-message hidden"></div>
+
+            <div id="stats" class="stats-container hidden">
+                <p>Statistics:</p>
+                <div class="stats-box">
+                    <p>Total URLs shortened: <span id="totalUrls"></span></p>
+                    <p>Total clicks: <span id="totalClicks"></span></p>
+                </div>
+            </div>
         </main>
 
         <footer>
-            <p>&copy; 2026 ShortLink. Simple & Secure.</p>
+            <p>&copy; <a target="_blank" rel="noopener noreferrer" href="https://eduvallve.com">Eduard Vallvé</a>, <span
+                    id="year"></span>. Simple & Secure.</p>
         </footer>
+    </div>
+    <div id="policies">
+        <span>By using this service, you agree to our <b>Privacy Policy</b> and <b>Terms of Service</b>.</span>
+        <details>
+            <summary>Privacy Policy</summary>
+            <p>We do not store any personal data. The only stored data is the shortened URLs and their
+                statistics.</p>
+        </details>
+        <details>
+            <summary>Terms of Service</summary>
+            <ul>
+                <li>We use <a target="_blank" rel="noopener noreferrer" href="https://turso.io">Turso</a> as our
+                    database provider.</li>
+                <li><b>edurl</b> is a free service provided by <a target="_blank" rel="noopener noreferrer"
+                        href="https://eduvallve.com">Eduard
+                        Vallvé</a>.</li>
+                <li>We are not responsible for the content of the shortened URLs.</li>
+            </ul>
+        </details>
     </div>
     <script src="script.js"></script>
 </body>

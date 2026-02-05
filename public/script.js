@@ -1,7 +1,7 @@
 const originalUrlInput = document.getElementById('originalUrl');
 const shortenBtn = document.getElementById('shortenBtn');
 const resultContainer = document.getElementById('result');
-const shortLink = document.getElementById('shortLink');
+const edurl = document.getElementById('edurl');
 const errorDiv = document.getElementById('error');
 
 async function shortenUrl() {
@@ -37,8 +37,8 @@ async function shortenUrl() {
         }
 
         // Success
-        shortLink.href = data.shortUrl;
-        shortLink.textContent = data.shortUrl;
+        edurl.href = data.shortUrl;
+        edurl.textContent = data.shortUrl;
         resultContainer.classList.remove('hidden');
 
     } catch (err) {
@@ -55,7 +55,7 @@ function showError(msg) {
 }
 
 function copyToClipboard() {
-    const url = shortLink.href;
+    const url = edurl.href;
     navigator.clipboard.writeText(url).then(() => {
         const btn = document.querySelector('.copy-btn');
         const originalText = btn.textContent;
@@ -67,3 +67,6 @@ function copyToClipboard() {
         console.error('Failed to copy: ', err);
     });
 }
+
+// Set current year in footer
+document.getElementById('year').textContent = new Date().getFullYear();
