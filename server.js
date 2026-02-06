@@ -342,7 +342,7 @@ function generateWarningPage(targetUrl, code) {
         <body>
             <div class="card">
                 <h1>Security Warning</h1>
-                <p>You are about to be redirected to a site<br>that has been <b>reported</b> for malicious activity:<br><b>${escapedUrl}</b></p>
+                <p>You are about to be redirected to a site that has been <b>reported</b> for malicious activity:<br><b>${escapedUrl}</b></p>
                 <p>Only proceed if you trust this link.</p>
                 <a href="${targetUrl}" class="btn">Proceed to Site</a>
                 <a href="/" class="cancel">Go Back to EdUrl</a>
