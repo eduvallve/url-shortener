@@ -2,33 +2,29 @@
 
 This Privacy Policy explains how **edurl** ("we", "our", or "the service") handles your information.
 
-## 1. Data Collection
-We are committed to protecting your privacy. **edurl** does not collect, store, or process any personal data from its users. 
+## 1. Data Collection & Legitimate Interest
+We are committed to protecting your privacy. **edurl** does not collect or store persistent personal identifiers like names or emails.
 
-- **No Personal Information**: We do not require registration, names, emails, or any other personal identifiers.
+- **IP Addresses**: We process IP addresses for the sole purpose of **rate limiting** and **abuse prevention** (security). This processing is based on our **Legitimate Interest** to protect the service from Denial of Service (DoS) attacks and malicious activities. IP addresses are not stored permanently in our database alongside shortened URLs, but may be present in temporary server logs (Vercel) for diagnostic purposes.
 - **No Cookies**: We do not use tracking cookies or third-party analytics that identify individual users.
 
 ## 2. Information We Store
-The only information stored in our database is:
+The information stored in our database (hosted by Turso) is:
 - **Shortened URLs**: The original long URL you provide.
 - **Short Codes**: The randomly generated code associated with the URL.
-- **Usage Statistics**: The total number of redirects (clicks) for each short link.
+- **Usage Statistics**: The total number of redirects (clicks) for each short link (aggregated, not linked to IPs).
 - **Timestamps**: The date and time when the URL was shortened.
 - **Abuse Reports**: If a URL is reported, we store the code and the reason for the report.
 
-## 3. Data Usage
-The stored information is used exclusively to:
-- Provide the URL shortening and redirection service.
-- Display aggregate usage statistics.
-- Moderation: Identify and remove URLs that violate our Terms of Service.
+## 3. Sub-processors
+To provide this service, we use the following third-party providers:
+- **Vercel**: Infrastructure and hosting provider. [Privacy Policy](https://vercel.com/legal/privacy-policy)
+- **Turso (ChiselStrike)**: Database provider. [Privacy Policy](https://turso.tech/privacy-policy)
 
-## 4. Data Sharing
-We do not share any data with third parties, except as required by our service providers (e.g., Turso for database hosting) to provide the service, or as required by law.
+## 4. Your Rights (GDPR)
+Under the General Data Protection Regulation (GDPR), users have the right to access, rectify, or erase their personal data. However, since we do not store personal data that identifies you or links specific URLs to your identity, we generally cannot fulfill "Right to Access" requests for specific URLs.
 
-## 5. Your Rights (GDPR)
-Under the General Data Protection Regulation (GDPR), users have the right to access, rectify, or erase their personal data. However, since we do not store any personal data that can identify you, we have no means of linking specific URLs to individual users.
+**Data Removal**: If you find a URL that contains your personal information or violates your privacy, please use the **Report Abuse** feature on the website to request its removal. We will review and act on all legitimate requests.
 
-If you find a URL that contains your personal information or violates your privacy, please use the **Report Abuse** feature on the website to request its removal.
-
-## 6. Contact
+## 5. Contact
 For any questions regarding this policy, please contact [Eduard Vallvé](https://eduvallve.com).
