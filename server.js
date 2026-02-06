@@ -325,6 +325,23 @@ app.get('/:code', redirectLimiter, async (req, res) => {
     }
 });
 
+// Get link count
+app.get('/api/link-count', async (req, res) => {
+    try {
+        await ensureTableExists();
+
+        const result = await db.execute({
+            sql: 'SELECT COUNT(*) as count FROM urls',
+            args: []
+        });
+
+        res.json({ count: result.rows[0].count });
+    } catch (err) {
+        console.error('Error getting link count:', err.message);
+        return res.status(500).json({ error: 'Database error' });
+    }
+});
+
 /**
  * Generates a security warning page for external redirects
  */

@@ -12,6 +12,7 @@ const reasonInput = document.getElementById('reportReason');
 const submitReportBtn = document.getElementById('submitReportBtn');
 const reportToggle = document.getElementById('reportBtn');
 const reportBox = document.getElementById('report-box');
+const linkCount = document.getElementById('linkCount');
 
 // Set current year in footer
 document.getElementById('year').textContent = new Date().getFullYear();
@@ -73,6 +74,12 @@ async function shortenUrl() {
         reportSection.classList.remove('hidden');
         reportSection.dataset.code = data.code;
 
+        // Show notification
+        showNotification('URL shortened successfully!', 'success');
+
+        // Update link count
+        getLinkCount();
+
     } catch (err) {
         showError(err.message);
     } finally {
@@ -128,20 +135,7 @@ function showNotification(message, type = 'info') {
     if (!toast) {
         toast = document.createElement('div');
         toast.id = 'toast';
-        toast.style.cssText = `
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            color: white;
-            font-weight: 500;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-            z-index: 1000;
-            transition: opacity 0.3s, transform 0.3s;
-            transform: translateY(100px);
-            opacity: 0;
-        `;
+        toast.classList.add('toast');
         toast.setAttribute('role', 'status');
         toast.setAttribute('aria-live', 'polite');
         document.body.appendChild(toast);
@@ -169,6 +163,16 @@ function copyToClipboard() {
         console.error('Failed to copy: ', err);
     });
 }
+
+// Get link count
+async function getLinkCount() {
+    const response = await fetch('/api/link-count');
+    const data = await response.json();
+    linkCount.textContent = data.count;
+}
+
+// Get link count on page load
+getLinkCount();
 
 /*
 Event Listeners

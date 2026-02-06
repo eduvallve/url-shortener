@@ -18,14 +18,6 @@
     --content-width: 600px;
 }
 
-* {
-    hyphens: auto;
-    -webkit-hyphens: auto;
-    -moz-hyphens: auto;
-    -ms-hyphens: auto;
-    -o-hyphens: auto;
-}
-
 body {
     font-family: 'Inter', sans-serif;
     background-color: var(--bg-color);
@@ -62,10 +54,23 @@ input:focus-visible {
     outline-offset: 0;
 }
 
+/* Utility class to hide elements on mobile */
+.hidden--mobile {
+    display: none;
+}
+
+@media screen and (min-width: 600px) {
+    .hidden--mobile {
+        display: block;
+    }
+}
+
+/* Logo */
 .logo {
     margin-block: 1rem;
 }
 
+/* Container */
 .container {
     background-color: var(--card-bg);
     padding: clamp(3vw, 2.5rem, 16px);
@@ -87,11 +92,27 @@ header h1 {
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    -ms-hyphens: auto;
+    -o-hyphens: auto;
 }
 
-header p {
+.header__text {
     color: var(--text-muted);
     margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+@media screen and (min-width: 600px) {
+    .header__text {
+        flex-direction: row;
+    }
 }
 
 .input-group {
@@ -144,7 +165,7 @@ button:active {
 
 .result-container {
     margin-top: 1.5rem;
-    padding: 1.5rem;
+    padding: 16px;
     background-color: #f9fafb;
     border-radius: 8px;
     border: 1px solid var(--border-color);
@@ -163,7 +184,7 @@ button:active {
     justify-content: space-between;
     align-items: center;
     background: white;
-    padding: 8px 12px;
+    padding: 8px;
     border-radius: 6px;
     border: 1px solid var(--border-color);
 }
@@ -185,6 +206,7 @@ button:active {
 .copy-btn {
     padding: 6px 12px;
     font-size: 0.875rem;
+    border-radius: 4px;
 }
 
 .success .copy-btn {
@@ -311,4 +333,24 @@ a {
     background-color: transparent;
     text-decoration: underline;
     color: var(--error-color-dark);
+}
+
+.toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transition: opacity 0.3s, transform 0.3s;
+    transform: translateY(100px);
+    opacity: 0;
+}
+
+.toast.show {
+    transform: translateY(0);
+    opacity: 1;
 }
