@@ -4,14 +4,17 @@
     --bg-color: #f3f4f6;
     --card-bg: #ffffff;
     --text-color: #1f2937;
-    --text-muted: #6b7280;
+    --text-muted: #575e6a;
+    /* Improved contrast from #677180 to meet WCAG AA (4.5:1) */
     --border-color: #e5e7eb;
     --error-bg: #fff1f2;
     --error-border: #fecaca;
-    --error-color: #ef4444;
+    --error-color: #dc2626;
+    /* Improved contrast from #ef4444 */
     --error-color-dark: #991b1b;
-    --success-color: #10b981;
-    --success-color-hover: #059669;
+    --success-color: #059669;
+    /* Improved contrast from #10b981 */
+    --success-color-hover: #047857;
     --content-width: 600px;
 }
 
@@ -34,6 +37,29 @@ body {
     min-height: 100dvh;
     padding: 0 16px;
     margin: 0;
+}
+
+/* Screen reader only utility */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Enhanced Focus Visibility */
+:focus-visible {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+input:focus-visible {
+    outline-offset: 0;
 }
 
 .logo {

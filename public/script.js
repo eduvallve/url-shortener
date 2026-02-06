@@ -142,6 +142,8 @@ function showNotification(message, type = 'info') {
             transform: translateY(100px);
             opacity: 0;
         `;
+        toast.setAttribute('role', 'status');
+        toast.setAttribute('aria-live', 'polite');
         document.body.appendChild(toast);
     }
 
@@ -201,6 +203,7 @@ if (reasonInput) {
 
 // Report input toggle
 reportToggle.addEventListener('click', () => {
-    reportBox.classList.toggle('hidden');
-    reportToggle.textContent = reportBox.classList.contains('hidden') ? 'Report this URL' : '⤬ Close';
+    const isHidden = reportBox.classList.toggle('hidden');
+    reportToggle.textContent = isHidden ? 'Report this URL' : '⤬ Close';
+    reportToggle.setAttribute('aria-expanded', !isHidden);
 });

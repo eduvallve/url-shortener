@@ -9,6 +9,12 @@ body {
     color: #111827;
 }
 
+/* Enhanced Focus Visibility */
+:focus-visible {
+    outline: 3px solid #6366f1;
+    outline-offset: 2px;
+}
+
 .card {
     background: white;
     padding: 2rem;

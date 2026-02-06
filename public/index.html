@@ -32,7 +32,8 @@
 
 <body>
     <!-- Logo -->
-    <svg class="logo" version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 207 209" width="60" height="61">
+    <svg class="logo" version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 207 209" width="60" height="61"
+        role="img" aria-label="EdUrl Logo">
         <LinearGradient id="gradient">
             <stop id="stop1" offset="0%" stop-color="#8e47c6"></stop>
             <stop id="stop2" offset="100%" stop-color="#a847ba"></stop>
@@ -51,23 +52,24 @@
 
         <main>
             <div class="input-group">
-                <input type="url" id="originalUrl" placeholder="Paste your long URL here..." required>
-                <button id="shortenBtn">Shorten</button>
+                <input type="url" id="originalUrl" placeholder="Paste your long URL here..." aria-label="URL to shorten"
+                    required>
+                <button id="shortenBtn" aria-label="Shorten URL">Shorten</button>
             </div>
 
-            <div id="result" class="result-container hidden">
+            <div id="result" class="result-container hidden" aria-live="polite">
                 <p>Your rounded URL:</p>
                 <div class="short-url-box">
-                    <a href="#" id="edurl" target="_blank"></a>
-                    <button class="copy-btn">Copy</button>
+                    <a href="#" id="edurl" target="_blank" aria-describedby="new-tab-desc"></a>
+                    <button class="copy-btn" aria-label="Copy shortened URL to clipboard">Copy</button>
                 </div>
             </div>
 
-            <div id="error" class="error-message hidden"></div>
+            <div id="error" class="error-message hidden" role="alert" aria-live="assertive"></div>
 
             <div id="report-section" class="report-container hidden">
                 <p class="report-text">Did you find this URL suspicious or malicious?
-                    <button id="reportBtn">Report this URL</button>
+                    <button id="reportBtn" aria-expanded="false" aria-controls="report-box">Report this URL</button>
                 </p>
                 <div id="report-box" class="report-box hidden">
                     <label for="reportReason">Report reason:</label>
@@ -82,19 +84,22 @@
     <div id="policies">
         <p>By using this service, you agree to our <a
                 href="https://github.com/eduvallve/url-shortener/blob/main/PRIVACY.md" target="_blank"
-                rel="noopener noreferrer">Privacy Policy</a>, <a
+                rel="noopener noreferrer">Privacy Policy <span class="sr-only">(opens in new tab)</span></a>, <a
                 href="https://github.com/eduvallve/url-shortener/blob/main/TERMS.md" target="_blank"
                 rel="noopener noreferrer">Terms
-                of Service</a>, and <a href="https://github.com/eduvallve/url-shortener/blob/main/DMCA.md"
-                target="_blank" rel="noopener noreferrer">DMCA
-                Policy</a>.</p>
+                of Service <span class="sr-only">(opens in new tab)</span></a>, and <a
+                href="https://github.com/eduvallve/url-shortener/blob/main/DMCA.md" target="_blank"
+                rel="noopener noreferrer">DMCA
+                Policy <span class="sr-only">(opens in new tab)</span></a>.</p>
     </div>
 
     <!-- Footer -->
     <footer>
-        <p>&copy; <a target="_blank" rel="noopener noreferrer" href="https://eduvallve.com">Eduard Vallvé</a>, <span
-                id="year"></span>. All rights reserved.</p>
+        <p>&copy; <a target="_blank" rel="noopener noreferrer" href="https://eduvallve.com">Eduard Vallvé <span
+                    class="sr-only">(opens in new tab)</span></a>, <span id="year"></span>. All rights reserved.</p>
     </footer>
+
+    <span id="new-tab-desc" class="sr-only">opens in a new tab</span>
     <script src="script.js"></script>
 </body>
 
