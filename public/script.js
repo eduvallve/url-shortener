@@ -6,10 +6,16 @@ const edurl = document.getElementById('edurl');
 const errorDiv = document.getElementById('error');
 const reportSection = document.getElementById('report-section');
 const reasonInput = document.getElementById('reportReason');
+const submitReportBtn = document.getElementById('submitReportBtn');
 
 // Set current year in footer
 document.getElementById('year').textContent = new Date().getFullYear();
 
+/*
+Functions
+*/
+
+// Shorten URL
 async function shortenUrl() {
     const originalUrl = originalUrlInput.value.trim();
 
@@ -65,6 +71,7 @@ async function shortenUrl() {
     }
 }
 
+// Submit report
 async function submitReport() {
     const code = reportSection.dataset.code;
     const reason = reasonInput.value.trim();
@@ -98,14 +105,13 @@ async function submitReport() {
     }
 }
 
+// Show error
 function showError(msg) {
     errorDiv.textContent = msg;
     errorDiv.classList.remove('hidden');
 }
 
-/**
- * Simple notification system to replace alert()
- */
+// Show notification
 function showNotification(message, type = 'info') {
     // Check if notification element exists, if not create it
     let toast = document.getElementById('toast');
@@ -140,39 +146,41 @@ function showNotification(message, type = 'info') {
     }, 4000);
 }
 
+// Copy to clipboard
 function copyToClipboard() {
     const url = edurl.href;
     navigator.clipboard.writeText(url).then(() => {
         const btn = document.querySelector('.copy-btn');
-        const originalText = btn.textContent;
         btn.textContent = 'Copied!';
         btn.parentNode.classList.add('success');
-        setTimeout(() => {
-            btn.textContent = originalText;
-        }, 2000);
     }).catch(err => {
         console.error('Failed to copy: ', err);
     });
 }
 
-// Event Listeners
+/*
+Event Listeners
+*/
+
+// Shorten URL by clicking button
 shortenBtn.addEventListener('click', shortenUrl);
 
-// Keyboard support: Allow pressing Enter to shorten
+// Shorten URL by pressing Enter
 originalUrlInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
         shortenUrl();
     }
 });
 
+// Copy to clipboard by clicking button
 document.querySelector('.copy-btn').addEventListener('click', copyToClipboard);
 
-const submitReportBtn = document.getElementById('submitReportBtn');
+// Submit report by clicking button
 if (submitReportBtn) {
     submitReportBtn.addEventListener('click', submitReport);
 }
 
-// Keyboard support for report reason
+// Submit report by pressing Enter
 if (reasonInput) {
     reasonInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
