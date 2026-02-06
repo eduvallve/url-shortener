@@ -10,6 +10,9 @@ const nodemailer = require('nodemailer');
 
 const app = express();
 
+// Trust Proxy (Required for Vercel/proxies and rate limiting)
+app.set('trust proxy', 1);
+
 // Middleware
 app.use(helmet({
     contentSecurityPolicy: {
