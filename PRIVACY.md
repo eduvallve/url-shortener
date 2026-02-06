@@ -14,7 +14,7 @@ The information stored in our database (hosted by Turso) is:
 - **Short Codes**: The randomly generated code associated with the URL.
 - **Usage Statistics**: The total number of redirects (clicks) for each short link (aggregated, not linked to IPs).
 - **Timestamps**: The date and time when the URL was shortened.
-- **Abuse Reports**: If a URL is reported, we store the code and the reason for the report.
+- **Abuse Reports**: If a URL is reported, we store the code and the reason for the report. Additionally, an automated email notification containing these details (but no personal reporter data) is sent to the service administrator for immediate review.
 
 ## 3. Sub-processors
 To provide this service, we use the following third-party providers:

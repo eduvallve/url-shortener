@@ -32,6 +32,14 @@ A simple, fast, and secure URL shortener service built with Node.js, Express, an
     ```env
     TURSO_DATABASE_URL=your_turso_database_url
     TURSO_AUTH_TOKEN=your_turso_auth_token
+    DATABASE_URL=your_turso_database_url
+    BASE_URL=https://your-domain.com
+
+    SMTP_HOST=smtp.example.com
+    SMTP_PORT=587
+    SMTP_USER=your_email
+    SMTP_PASS=your_password
+    ADMIN_EMAIL=your_admin_email
     ```
 
 ## Local Development
@@ -59,6 +67,10 @@ A simple, fast, and secure URL shortener service built with Node.js, Express, an
     - Add the following variables for all environments (Production, Preview, Development):
       - `TURSO_DATABASE_URL`: Your Turso database URL
       - `TURSO_AUTH_TOKEN`: Your Turso authentication token
+      - `DATABASE_URL`: Your Turso database URL
+      - `BASE_URL`: Your domain name
+      - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`: Your email provider settings
+      - `ADMIN_EMAIL`: The email address where you want to receive abuse reports
 
 3.  **Redeploy** if you added variables after initial deployment.
 

@@ -6,6 +6,7 @@ const rateLimit = require('express-rate-limit');
 const { createClient } = require('@libsql/client');
 const path = require('path');
 const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 
 const app = express();
 
@@ -43,6 +44,59 @@ if (!process.env.TURSO_DATABASE_URL || !process.env.TURSO_AUTH_TOKEN) {
     }
 }
 
+// Email Transporter Configuration
+const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    secure: process.env.SMTP_PORT == 465, // true for 465, false for other ports
+    auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+    },
+});
+
+// Helper to send report email
+async function sendReportEmail(reportDetails) {
+    if (!process.env.ADMIN_EMAIL || !process.env.SMTP_HOST) {
+        console.warn('Email configuration missing. Skipping report notification.');
+        return;
+    }
+
+    const mailOptions = {
+        from: `"EdUrl Reporter" <${process.env.SMTP_USER}>`,
+        to: process.env.ADMIN_EMAIL,
+        subject: `[EdUrl] New URL Report: ${reportDetails.urlCode}`,
+        html: `
+            <div style = "font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0;" >
+                <div style="background-color: #ffffff; padding: 24px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                    <h2 style="color: #0f172a; margin-top: 0; font-size: 24px;">New Report Received 🚨</h2>
+                    <p style="color: #475569; font-size: 16px;">A user has reported a shortened URL for review.</p>
+                    
+                    <div style="background-color: #f1f5f9; padding: 16px; border-radius: 6px; margin: 20px 0;">
+                        <p style="margin: 8px 0; color: #334155;"><strong>Short Code:</strong> <span style="font-family: monospace; background: #e2e8f0; padding: 2px 6px; border-radius: 4px;">${reportDetails.urlCode}</span></p>
+                        <p style="margin: 8px 0; color: #334155;"><strong>Original URL:</strong> <a href="${process.env.BASE_URL}/${reportDetails.urlCode}" style="color: #2563eb; text-decoration: none;">${reportDetails.originalUrl || 'Not available'}</a></p>
+                        <p style="margin: 8px 0; color: #334155;"><strong>Reason:</strong> <span style="font-weight: 500; color: #ef4444;">${reportDetails.reason}</span></p>
+                        <p style="margin: 8px 0; color: #334155;"><strong>Time:</strong> ${new Date().toLocaleString()}</p>
+                    </div>
+
+                    <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 24px;">
+                        <p style="font-size: 12px; color: #64748b; margin-bottom: 4px;"><strong>Database URL:</strong> <a href="${process.env.DATABASE_URL}" style="color: #64748b;">${process.env.DATABASE_URL}</a></p>
+                        <p style="font-size: 12px; color: #94a3b8; margin-top: 8px;">To disable these notifications, please remove the SMTP configuration from your dashboard.</p>
+                    </div>
+                </div>
+                <p style="text-align: center; color: #94a3b8; font-size: 12px; margin-top: 20px;">Sent automatically by EdUrl Manager</p>
+            </div>
+        `,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log(`Report email sent for code ${reportDetails.urlCode}`);
+    } catch (error) {
+        console.error('Error sending report email:', error);
+    }
+}
+
 // URL Validation Constants
 const BLOCKED_DOMAINS = ['bit.ly', 'tinyurl.com', 't.co', 'goo.gl', 'edurl.vercel.app']; // Added own domain
 const ALLOWED_PROTOCOLS = ['http:', 'https:'];                    // Added http for local development
@@ -52,8 +106,8 @@ const MAX_URL_LENGTH = 2048;                                      // Maximum URL
 const shortenLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,                                     // 15 minutes
     max: 20,                                                      // Limit each IP to 20 requests per windowMs
-    standardHeaders: true,                                        // Return rate limit info in the `RateLimit-*` headers
-    legacyHeaders: false,                                         // Disable the `X-RateLimit-*` headers
+    standardHeaders: true,                                        // Return rate limit info in the `RateLimit -* ` headers
+    legacyHeaders: false,                                         // Disable the `X - RateLimit -* ` headers
 });
 
 // Anti-Scraping Limiter for Redirects
@@ -61,8 +115,8 @@ const redirectLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,                                     // 15 minutes
     max: 100,                                                     // Limit each IP to 100 requests per 15 mins (more permissive than shorten)
     message: 'Too many redirection requests, please try again in 15 minutes.',
-    standardHeaders: true,                                        // Return rate limit info in the `RateLimit-*` headers
-    legacyHeaders: false,                                         // Disable the `X-RateLimit-*` headers
+    standardHeaders: true,                                        // Return rate limit info in the `RateLimit -* ` headers
+    legacyHeaders: false,                                         // Disable the `X - RateLimit -* ` headers
 });
 
 // Database Setup - Turso
@@ -279,6 +333,25 @@ app.post('/api/report', async (req, res) => {
         });
 
         res.json({ message: 'Report submitted successfully' });
+
+        // Send email notification asynchronously (don't block response)
+        // We need to fetch the original URL for key info context
+        try {
+            const urlResult = await db.execute({
+                sql: 'SELECT original_url FROM urls WHERE code = ?',
+                args: [code]
+            });
+
+            const originalUrl = urlResult.rows.length > 0 ? urlResult.rows[0].original_url : 'Unknown';
+
+            sendReportEmail({
+                urlCode: code,
+                originalUrl: originalUrl,
+                reason: reason
+            });
+        } catch (emailErr) {
+            console.error('Error triggering email notification:', emailErr);
+        }
     } catch (err) {
         console.error('Error submitting report:', err.message);
         return res.status(500).json({ error: 'Database error' });
