@@ -6,7 +6,10 @@
     --text-color: #1f2937;
     --text-muted: #6b7280;
     --border-color: #e5e7eb;
+    --error-bg: #fff1f2;
+    --error-border: #fecaca;
     --error-color: #ef4444;
+    --error-color-dark: #991b1b;
     --success-color: #10b981;
     --success-color-hover: #059669;
     --content-width: 600px;
@@ -209,52 +212,77 @@ a {
 .report-container {
     margin-top: 1.5rem;
     padding: 1rem;
-    background-color: #fff1f2;
+    background-color: var(--error-bg);
     border-radius: 8px;
-    border: 1px solid #fecaca;
+    border: 1px solid var(--error-border);
     text-align: left;
 }
 
-.report-container hr {
-    border: 0;
-    border-top: 1px solid #fecaca;
-    margin-bottom: 1rem;
-}
-
-.report-container p {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #991b1b;
-    margin-bottom: 0.5rem;
-    margin-top: 0;
-}
-
-.report-box {
+.report-box:not(.hidden) {
     display: flex;
     gap: 10px;
     flex-direction: column;
+    margin-top: 16px;
+    align-items: center;
 }
 
 @media screen and (min-width: 600px) {
-    .report-box {
+    .report-box:not(.hidden) {
         flex-direction: row;
     }
 }
 
-.report-box input {
+.report-box:not(.hidden) label {
+    font-size: 0.875rem;
+    color: var(--error-color);
+    margin-block: 0;
+    font-weight: 600;
+}
+
+.report-box:not(.hidden) input {
     flex: 1;
     padding: 8px 12px;
-    border: 1px solid #fecaca;
+    border: 1px solid var(--error-border);
     border-radius: 6px;
     font-size: 0.875rem;
 }
 
-.report-box button {
+.report-box:not(.hidden) button {
     padding: 8px 16px;
     font-size: 0.875rem;
-    background-color: #ef4444;
+    background-color: var(--error-color);
 }
 
-.report-box button:hover {
-    background-color: #dc2626;
+.report-box:not(.hidden) button:hover {
+    background-color: var(--error-color-dark);
+}
+
+.report-text {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 0.875rem;
+    color: var(--error-color);
+    margin-block: 0;
+}
+
+.report-text button {
+    padding: 0;
+    color: inherit;
+    background-color: transparent;
+    text-decoration: underline;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    font-weight: 600;
+    font-size: inherit;
+    text-wrap-mode: nowrap;
+}
+
+.report-text button:hover {
+    background-color: transparent;
+    text-decoration: underline;
+    color: var(--error-color-dark);
 }

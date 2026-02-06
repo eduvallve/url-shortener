@@ -65,17 +65,12 @@
 
             <div id="error" class="error-message hidden"></div>
 
-            <!-- <div id="stats" class="stats-container hidden">
-                <p>Statistics:</p>
-                <div class="stats-box">
-                    <p>Total URLs shortened: <span id="totalUrls"></span></p>
-                    <p>Total clicks: <span id="totalClicks"></span></p>
-                </div>
-            </div> -->
-
             <div id="report-section" class="report-container hidden">
-                <p>Report Abuse:</p>
-                <div class="report-box">
+                <p class="report-text">Did you find this URL suspicious or malicious?
+                    <button id="reportBtn">Report this URL</button>
+                </p>
+                <div id="report-box" class="report-box hidden">
+                    <label for="reportReason">Report reason:</label>
                     <input type="text" id="reportReason" placeholder="Reason (e.g., phishing, malware)...">
                     <button id="submitReportBtn">Submit Report</button>
                 </div>

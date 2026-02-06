@@ -1,3 +1,6 @@
+// Set variables
+const MIN_URL_LENGTH = 29; // Minimum URL length to be shortened
+
 // Get DOM elements
 const originalUrlInput = document.getElementById('originalUrl');
 const shortenBtn = document.getElementById('shortenBtn');
@@ -7,6 +10,8 @@ const errorDiv = document.getElementById('error');
 const reportSection = document.getElementById('report-section');
 const reasonInput = document.getElementById('reportReason');
 const submitReportBtn = document.getElementById('submitReportBtn');
+const reportToggle = document.getElementById('reportBtn');
+const reportBox = document.getElementById('report-box');
 
 // Set current year in footer
 document.getElementById('year').textContent = new Date().getFullYear();
@@ -33,6 +38,11 @@ async function shortenUrl() {
         new URL(originalUrl);
     } catch (_) {
         showError('Please enter a valid URL (including http:// or https://).');
+        return;
+    }
+
+    if (originalUrl.length < MIN_URL_LENGTH) {
+        showError('We can\'t make this URL shorter. (Min: ' + MIN_URL_LENGTH + ' chars)');
         return;
     }
 
@@ -188,3 +198,9 @@ if (reasonInput) {
         }
     });
 }
+
+// Report input toggle
+reportToggle.addEventListener('click', () => {
+    reportBox.classList.toggle('hidden');
+    reportToggle.textContent = reportBox.classList.contains('hidden') ? 'Report this URL' : '⤬ Close';
+});
