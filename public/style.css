@@ -182,13 +182,13 @@ button:active {
 footer {
     margin-top: 2rem;
     font-size: 0.8rem;
-    color: var(--text-muted);
+    color: var(--text-color);
 }
 
 #policies {
     text-align: start;
     font-size: 12px;
-    color: var(--text-muted);
+    color: var(--text-color);
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -199,6 +199,7 @@ footer {
 
 details {
     font-size: 12px;
+    padding-block: 8px;
 }
 
 a {

@@ -13,15 +13,25 @@ const app = express();
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
-            defaultSrc: ["'self'"],
-            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-            fontSrc: ["'self'", "https://fonts.gstatic.com"],
-            scriptSrc: ["'self'"],
-            imgSrc: ["'self'", "data:", "https://*"],
+            defaultSrc: ["'self'"],                                // Allow content from own origin
+            styleSrc: ["'self'", "https://fonts.googleapis.com"],  // Allow styles from Google Fonts
+            fontSrc: ["'self'", "https://fonts.gstatic.com"],      // Allow fonts from Google Fonts
+            scriptSrc: ["'self'"],                                 // Allow scripts from own origin
+            imgSrc: ["'self'", "data:", "https://*"],              // Allow images from any origin
+            connectSrc: ["'self'"],                                // Allow API calls
+            objectSrc: ["'none'"],                                 // Prevent loading of plugins
+            upgradeInsecureRequests: [],                           // Upgrade insecure requests to HTTPS
         },
     },
+    hsts: {
+        maxAge: 31536000,                                          // 1 year
+        includeSubDomains: true,                                   // Include subdomains
+        preload: true                                              // Preload HSTS in browser
+    },
+    noSniff: true,
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' }  // Referrer policy
 }));
-app.use(express.json({ limit: '10kb' })); // DoS: Limit payload size
+app.use(express.json({ limit: '10kb' }));                          // DoS: Limit payload size
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Validate environment variables
@@ -35,30 +45,30 @@ if (!process.env.TURSO_DATABASE_URL || !process.env.TURSO_AUTH_TOKEN) {
 
 // URL Validation Constants
 const BLOCKED_DOMAINS = ['bit.ly', 'tinyurl.com', 't.co', 'goo.gl', 'edurl.vercel.app']; // Added own domain
-const ALLOWED_PROTOCOLS = ['http:', 'https:'];
-const MAX_URL_LENGTH = 2048;
+const ALLOWED_PROTOCOLS = ['http:', 'https:'];                    // Added http for local development
+const MAX_URL_LENGTH = 2048;                                      // Maximum URL length (2048 characters)
 
 // Rate Limiting Configuration
 const shortenLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 20, // Limit each IP to 20 requests per windowMs
-    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    windowMs: 15 * 60 * 1000,                                     // 15 minutes
+    max: 20,                                                      // Limit each IP to 20 requests per windowMs
+    standardHeaders: true,                                        // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false,                                         // Disable the `X-RateLimit-*` headers
 });
 
 // Anti-Scraping Limiter for Redirects
 const redirectLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests per 15 mins (more permissive than shorten)
+    windowMs: 15 * 60 * 1000,                                     // 15 minutes
+    max: 100,                                                     // Limit each IP to 100 requests per 15 mins (more permissive than shorten)
     message: 'Too many redirection requests, please try again in 15 minutes.',
-    standardHeaders: true,
-    legacyHeaders: false,
+    standardHeaders: true,                                        // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false,                                         // Disable the `X-RateLimit-*` headers
 });
 
 // Database Setup - Turso
 const db = createClient({
-    url: process.env.TURSO_DATABASE_URL,
-    authToken: process.env.TURSO_AUTH_TOKEN
+    url: process.env.TURSO_DATABASE_URL,                          // Turso database URL
+    authToken: process.env.TURSO_AUTH_TOKEN                       // Turso authentication token
 });
 
 // Database initialization flag
@@ -127,12 +137,20 @@ function validateUrl(urlString) {
 
     // Block local/private addresses
     const hostname = url.hostname.toLowerCase();
-    if (hostname === 'localhost' ||
-        hostname === '127.0.0.1' ||
-        hostname.startsWith('192.168.') ||
-        hostname.startsWith('10.') ||
-        hostname.startsWith('172.')) {
-        throw new Error('Shortening local or private URLs is not allowed.');
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        throw new Error('Shortening local URLs is not allowed.');
+    }
+
+    // IP address validation for SSRF (matches direct IPs better)
+    const ipRegex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
+    if (ipRegex.test(hostname)) {
+        const parts = hostname.split('.').map(Number);
+        const first = parts[0];
+        const second = parts[1];
+        // 127.0.0.1 (Loopback), 10.0.0.0/8 (Private), 192.168.0.0/16 (Private), 172.16.0.0/12 (Private), 192.168.0.0/16 (Private)
+        if (first === 127 || first === 10 || (first === 192 && second === 168) || (first === 172 && second >= 16 && second <= 31)) {
+            throw new Error('Shortening private IP addresses is not allowed.');
+        }
     }
 
     // Block other shorteners to prevent chains
@@ -235,6 +253,11 @@ app.post('/api/report', async (req, res) => {
 
     if (!code || !reason) {
         return res.status(400).json({ error: 'Code and reason are required' });
+    }
+
+    // Validate code format (6 alphanumeric characters)
+    if (!/^[a-zA-Z0-9]{6}$/.test(code)) {
+        return res.status(400).json({ error: 'Invalid short code format' });
     }
 
     try {
