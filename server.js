@@ -18,12 +18,11 @@ app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],                                // Allow content from own origin
-            styleSrc: ["'self'", "https://fonts.googleapis.com", "https://vercel.live"], // Allow styles from Google Fonts & Vercel
-            fontSrc: ["'self'", "https://fonts.gstatic.com", "https://assets.vercel.com"], // Allow fonts from Google Fonts & Vercel
-            scriptSrc: ["'self'", "https://vercel.live"],          // Allow scripts from own origin & Vercel
+            styleSrc: ["'self'", "https://fonts.googleapis.com"],  // Allow styles from Google Fonts
+            fontSrc: ["'self'", "https://fonts.gstatic.com"],      // Allow fonts from Google Fonts
+            scriptSrc: ["'self'"],                                 // Allow scripts from own origin
             imgSrc: ["'self'", "data:", "https://*"],              // Allow images from any origin
-            frameSrc: ["'self'", "https://vercel.live"],           // Allow Vercel frames
-            connectSrc: ["'self'", "https://vercel.live"],         // Allow API calls & Vercel
+            connectSrc: ["'self'"],                                // Allow API calls
             objectSrc: ["'none'"],                                 // Prevent loading of plugins
             upgradeInsecureRequests: [],                           // Upgrade insecure requests to HTTPS
         },
