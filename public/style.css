@@ -164,7 +164,6 @@ button {
     cursor: pointer;
     transition: background-color 0.2s, transform 0.1s;
     min-height: 44px;
-    min-width: 44px;
 }
 
 button:hover {
@@ -353,7 +352,6 @@ a {
     transition: background-color 0.2s, transform 0.1s;
     font-weight: 600;
     font-size: inherit;
-    text-wrap-mode: nowrap;
 }
 
 .report-text button:hover {
