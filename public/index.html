@@ -32,6 +32,7 @@
 </head>
 
 <body>
+    <a href="#main" class="skip-link">Skip to main content</a>
     <!-- Logo -->
     <svg class="logo" version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 207 209" width="60" height="61"
         role="img" aria-label="EdUrl Logo">
@@ -72,6 +73,7 @@
             <div id="error" class="error-message hidden" role="alert" aria-live="assertive"></div>
 
             <div id="report-section" class="report-container hidden">
+                <h2 class="sr-only">Report suspicious URL</h2>
                 <p class="report-text">Did you find this URL suspicious or malicious?
                     <button id="reportBtn" aria-expanded="false" aria-controls="report-box">Report this URL</button>
                 </p>
@@ -85,7 +87,8 @@
     </div>
 
     <!-- Policies -->
-    <div id="policies">
+    <div class="policies" role="region" aria-label="Policies">
+        <h2 class="sr-only">Policies</h2>
         <p>By using this service, you agree to our <a
                 href="https://github.com/eduvallve/url-shortener/blob/main/PRIVACY.md" target="_blank"
                 rel="noopener noreferrer">Privacy Policy<span class="sr-only"> (opens in new tab)</span></a>, <a
@@ -103,7 +106,6 @@
                     class="sr-only"> (opens in new tab)</span></a>, <span id="year"></span>. All rights reserved.</p>
     </footer>
 
-    <span id="new-tab-desc" class="sr-only">opens in a new tab</span>
     <script src="script.js"></script>
 </body>
 

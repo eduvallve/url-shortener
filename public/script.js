@@ -136,20 +136,23 @@ function showNotification(message, type = 'info') {
         toast = document.createElement('div');
         toast.id = 'toast';
         toast.classList.add('toast');
-        toast.setAttribute('role', 'status');
-        toast.setAttribute('aria-live', 'polite');
+        toast.setAttribute('role', 'status'); // Status: Indicates that an update has occurred
+        toast.setAttribute('aria-live', 'polite'); // Polite: Wait for user to finish current action before announcing
+        toast.setAttribute('aria-label', message); // Set aria-label to the message
+        toast.setAttribute('aria-hidden', 'true'); // Hidden by default
         document.body.appendChild(toast);
     }
 
     toast.textContent = message;
-    toast.style.background = type === 'success' ? '#10b981' : (type === 'error' ? '#ef4444' : '#6366f1');
+    const styleClass = type === 'success' ? 'success' : (type === 'error' ? 'error' : 'info');
+    toast.classList.add(styleClass);
     toast.style.transform = 'translateY(0)';
     toast.style.opacity = '1';
 
     setTimeout(() => {
         toast.style.transform = 'translateY(100px)';
         toast.style.opacity = '0';
-    }, 4000);
+    }, 6000);
 }
 
 // Copy to clipboard
@@ -157,7 +160,8 @@ function copyToClipboard() {
     const url = edurl.href;
     navigator.clipboard.writeText(url).then(() => {
         const btn = document.querySelector('.copy-btn');
-        btn.textContent = 'Copied!';
+        btn.textContent = 'Copied';
+        btn.setAttribute('aria-label', 'Copied to clipboard');
         btn.parentNode.classList.add('success');
     }).catch(err => {
         console.error('Failed to copy: ', err);
@@ -182,7 +186,7 @@ Event Listeners
 shortenBtn.addEventListener('click', shortenUrl);
 
 // Shorten URL by pressing Enter
-originalUrlInput.addEventListener('keypress', (e) => {
+originalUrlInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
         shortenUrl();
     }
@@ -198,7 +202,7 @@ if (submitReportBtn) {
 
 // Submit report by pressing Enter
 if (reasonInput) {
-    reasonInput.addEventListener('keypress', (e) => {
+    reasonInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             submitReport();
         }

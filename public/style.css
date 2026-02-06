@@ -1,21 +1,29 @@
 :root {
-    --primary-color: #4f46e5;
-    --primary-hover: #4338ca;
+    --primary-color: #312e81;
+    /* Darkened from #4f46e5 for 7.1+ contrast */
+    --primary-hover: #1e1b4b;
     --bg-color: #f3f4f6;
     --card-bg: #ffffff;
     --text-color: #1f2937;
-    --text-muted: #575e6a;
+    --text-muted: #374151;
+    /* Darkened from #575e6a for 7:1 contrast */
     /* Improved contrast from #677180 to meet WCAG AA (4.5:1) */
     --border-color: #e5e7eb;
     --error-bg: #fff1f2;
     --error-border: #fecaca;
-    --error-color: #dc2626;
+    --error-color: #A01818;
+    /* Darkened from #dc2626 for 7:1 contrast */
     /* Improved contrast from #ef4444 */
-    --error-color-dark: #991b1b;
-    --success-color: #059669;
+    --error-color-dark: #7f1d1d;
+    --success-color: #076445;
+    /* Darkened from #059669 for 7:1 contrast */
     /* Improved contrast from #10b981 */
-    --success-color-hover: #047857;
+    --success-color-hover: #065138;
     --content-width: 600px;
+}
+
+* {
+    line-height: 1.5;
 }
 
 body {
@@ -137,6 +145,8 @@ input[type="url"] {
     font-size: 1rem;
     outline: none;
     transition: border-color 0.2s;
+    min-height: 44px;
+    box-sizing: border-box;
 }
 
 input[type="url"]:focus {
@@ -153,6 +163,8 @@ button {
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s, transform 0.1s;
+    min-height: 44px;
+    min-width: 44px;
 }
 
 button:hover {
@@ -197,6 +209,9 @@ button:active {
     text-overflow: ellipsis;
     white-space: nowrap;
     margin-right: 10px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
 }
 
 .short-url-box a:hover {
@@ -236,16 +251,26 @@ footer {
     color: var(--text-color);
 }
 
-#policies {
+.skip-link,
+.policies {
     text-align: center;
     font-size: 12px;
     color: var(--text-color);
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
     margin-top: 56px;
     width: var(--content-width);
     max-width: 100%;
+}
+
+.skip-link {
+    position: absolute;
+    top: 0;
+    margin: 0;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: var(--text-muted);
 }
 
 details {
@@ -259,7 +284,7 @@ a {
 
 .report-container {
     margin-top: 1.5rem;
-    padding: 1rem;
+    padding: 0.5rem 1rem;
     background-color: var(--error-bg);
     border-radius: 8px;
     border: 1px solid var(--error-border);
@@ -293,6 +318,8 @@ a {
     border: 1px solid var(--error-border);
     border-radius: 6px;
     font-size: 0.875rem;
+    min-height: 44px;
+    box-sizing: border-box;
 }
 
 .report-box:not(.hidden) button {
@@ -350,7 +377,14 @@ a {
     opacity: 0;
 }
 
-.toast.show {
-    transform: translateY(0);
-    opacity: 1;
+.toast.success {
+    background-color: var(--success-color);
+}
+
+.toast.error {
+    background-color: var(--error-color);
+}
+
+.toast.info {
+    background-color: var(--primary-color);
 }
