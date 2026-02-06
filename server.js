@@ -8,12 +8,6 @@ const path = require('path');
 const crypto = require('crypto');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Security Configuration: Define your production domain here
-// In production, this should be set via environment variable
-const APP_DOMAIN = process.env.APP_DOMAIN || 'edurl.vercel.app';
-const TRUSTED_HOSTS = [APP_DOMAIN, 'localhost', `localhost:${PORT}`];
 
 // Middleware
 app.use(helmet({
@@ -56,7 +50,7 @@ const shortenLimiter = rateLimit({
 const redirectLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100, // Limit each IP to 100 requests per 15 mins (more permissive than shorten)
-    message: 'Too many redirection requests, please try again later.',
+    message: 'Too many redirection requests, please try again in 15 minutes.',
     standardHeaders: true,
     legacyHeaders: false,
 });
@@ -146,11 +140,6 @@ function validateUrl(urlString) {
         throw new Error('Shortening other URL shorteners is not allowed to prevent redirect chains.');
     }
 
-    // Strict own-domain recursion check
-    if (hostname === APP_DOMAIN || hostname.endsWith('.' + APP_DOMAIN)) {
-        throw new Error('You cannot shorten internal EdUrl links.');
-    }
-
     return true;
 }
 
@@ -193,10 +182,7 @@ app.post('/api/shorten', shortenLimiter, async (req, res) => {
 
         // If URL already exists, return the existing short URL
         if (existingRow) {
-            // Fix Host Header Injection: Use APP_DOMAIN instead of req.get('host')
-            // For local development, we fallback to host header if APP_DOMAIN is default
-            const displayHost = (process.env.NODE_ENV === 'production') ? APP_DOMAIN : req.get('host');
-            const shortUrl = `${req.protocol}://${displayHost}/${existingRow.code}`;
+            const shortUrl = `${req.protocol}://${req.get('host')}/${existingRow.code}`;
             return res.json({
                 originalUrl,
                 code: existingRow.code,
@@ -235,7 +221,7 @@ app.post('/api/shorten', shortenLimiter, async (req, res) => {
             args: [sanitizedUrl, code]
         });
 
-        const shortUrl = `${req.protocol}://${(process.env.NODE_ENV === 'production') ? APP_DOMAIN : req.get('host')}/${code}`;
+        const shortUrl = `${req.protocol}://${req.get('host')}/${code}`;
         res.json({ originalUrl, code, shortUrl, existing: false });
     } catch (err) {
         console.error('Error processing URL:', err.message);

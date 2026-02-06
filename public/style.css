@@ -33,6 +33,10 @@ body {
     margin: 0;
 }
 
+.logo {
+    margin-bottom: 1rem;
+}
+
 .container {
     background-color: var(--card-bg);
     padding: 2.5rem clamp(3vw, 2.5rem, 16px);
