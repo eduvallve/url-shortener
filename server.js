@@ -20,9 +20,9 @@ app.use(helmet({
             defaultSrc: ["'self'"],                                // Allow content from own origin
             styleSrc: ["'self'", "https://fonts.googleapis.com"],  // Allow styles from Google Fonts
             fontSrc: ["'self'", "https://fonts.gstatic.com"],      // Allow fonts from Google Fonts
-            scriptSrc: ["'self'"],                                 // Allow scripts from own origin
+            scriptSrc: ["'self'", "https://cloud.umami.is"],       // Allow scripts from own origin + Umami
             imgSrc: ["'self'", "data:", "https://*"],              // Allow images from any origin
-            connectSrc: ["'self'"],                                // Allow API calls
+            connectSrc: ["'self'", "https://cloud.umami.is"],      // Allow API calls + Umami
             objectSrc: ["'none'"],                                 // Prevent loading of plugins
             upgradeInsecureRequests: [],                           // Upgrade insecure requests to HTTPS
         },
@@ -105,6 +105,20 @@ const BLOCKED_DOMAINS = ['bit.ly', 'tinyurl.com', 't.co', 'goo.gl', 'edurl.verce
 const ALLOWED_PROTOCOLS = ['http:', 'https:'];                    // Added http for local development
 const MAX_URL_LENGTH = 2048;                                      // Maximum URL length (2048 characters)
 
+// Analytics: IPs excluded from click tracking (localhost + custom list from env)
+const LOOPBACK_IPS = new Set(['127.0.0.1', '::1', '::ffff:127.0.0.1']);
+const EXCLUDED_IPS = new Set(
+    (process.env.ANALYTICS_EXCLUDED_IPS || '')
+        .split(',')
+        .map(ip => ip.trim())
+        .filter(Boolean)
+);
+
+function isExcludedIp(ip) {
+    if (!ip) return false;
+    return LOOPBACK_IPS.has(ip) || EXCLUDED_IPS.has(ip);
+}
+
 // Rate Limiting Configuration
 const shortenLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,                                     // 15 minutes
@@ -159,6 +173,17 @@ async function ensureTableExists() {
         )`);
 
         reportsTableInitialised = true;
+
+        // Analytics: track clicks per URL
+        await db.execute(`CREATE TABLE IF NOT EXISTS clicks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            url_code TEXT NOT NULL,
+            clicked_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            referer TEXT,
+            user_agent TEXT,
+            FOREIGN KEY (url_code) REFERENCES urls(code)
+        )`);
+        await db.execute(`CREATE INDEX IF NOT EXISTS idx_clicks_url_code ON clicks(url_code)`);
 
         dbInitialized = urlsTableInitialised && reportsTableInitialised;
         console.log('Database tables ready.');
@@ -384,6 +409,18 @@ app.get('/:code', redirectLimiter, async (req, res) => {
         // Security Header: Prevent referrer leakage during redirect
         res.setHeader('Referrer-Policy', 'no-referrer');
 
+        // Analytics: record click (fire-and-forget, skip excluded IPs)
+        if (!isExcludedIp(req.ip)) {
+            db.execute({
+                sql: 'INSERT INTO clicks (url_code, referer, user_agent) VALUES (?, ?, ?)',
+                args: [
+                    code,
+                    req.get('referer') || null,
+                    req.get('user-agent') || null
+                ]
+            }).catch(err => console.error('Error recording click:', err.message));
+        }
+
         // Optimization: Use a quick check for reports
         const reports = await db.execute({
             sql: 'SELECT 1 FROM reports WHERE url_code = ? LIMIT 1',
@@ -414,6 +451,75 @@ app.get('/api/link-count', async (req, res) => {
         res.json({ count: result.rows[0].count });
     } catch (err) {
         console.error('Error getting link count:', err.message);
+        return res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Global analytics stats
+app.get('/api/stats', async (req, res) => {
+    try {
+        await ensureTableExists();
+
+        const [urlsResult, clicksResult] = await Promise.all([
+            db.execute({ sql: 'SELECT COUNT(*) as count FROM urls', args: [] }),
+            db.execute({ sql: 'SELECT COUNT(*) as count FROM clicks', args: [] })
+        ]);
+
+        res.json({
+            total_urls: urlsResult.rows[0].count,
+            total_clicks: clicksResult.rows[0].count
+        });
+    } catch (err) {
+        console.error('Error getting global stats:', err.message);
+        return res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Per-URL analytics stats
+app.get('/api/stats/:code', async (req, res) => {
+    const { code } = req.params;
+
+    if (!/^[a-zA-Z0-9]{6}$/.test(code)) {
+        return res.status(400).json({ error: 'Invalid short code format' });
+    }
+
+    try {
+        await ensureTableExists();
+
+        // Check the URL exists
+        const urlResult = await db.execute({
+            sql: 'SELECT original_url, created_at FROM urls WHERE code = ?',
+            args: [code]
+        });
+
+        if (urlResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Short URL not found' });
+        }
+
+        // Total clicks + last click
+        const summaryResult = await db.execute({
+            sql: 'SELECT COUNT(*) as total_clicks, MAX(clicked_at) as last_click FROM clicks WHERE url_code = ?',
+            args: [code]
+        });
+
+        // Top 5 referrers
+        const referrersResult = await db.execute({
+            sql: `SELECT COALESCE(referer, 'Direct') as referer, COUNT(*) as count
+                  FROM clicks WHERE url_code = ?
+                  GROUP BY referer ORDER BY count DESC LIMIT 5`,
+            args: [code]
+        });
+
+        res.json({
+            code,
+            original_url: urlResult.rows[0].original_url,
+            created_at: urlResult.rows[0].created_at,
+            total_clicks: summaryResult.rows[0].total_clicks,
+            last_click: summaryResult.rows[0].last_click,
+            top_referrers: referrersResult.rows
+        });
+    } catch (err) {
+        console.error('Error getting stats for code:', err.message);
         return res.status(500).json({ error: 'Database error' });
     }
 });
