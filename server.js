@@ -18,7 +18,7 @@ app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],                                // Allow content from own origin
-            styleSrc: ["'self'", "https://fonts.googleapis.com"],  // Allow styles from Google Fonts
+            styleSrc: ["'self'", "https://fonts.googleapis.com", 'sha256-19U6/ccNF8aPwxmQzpRtgfKkvWkb+WjEmvRtplbo75Q='],  // Allow styles from Google Fonts
             fontSrc: ["'self'", "https://fonts.gstatic.com"],      // Allow fonts from Google Fonts
             scriptSrc: ["'self'", "https://cloud.umami.is", "https://vercel.live"],       // Allow scripts from own origin + Umami
             imgSrc: ["'self'", "data:", "https://*"],              // Allow images from any origin
