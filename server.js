@@ -20,9 +20,9 @@ app.use(helmet({
             defaultSrc: ["'self'"],                                // Allow content from own origin
             styleSrc: ["'self'", "https://fonts.googleapis.com"],  // Allow styles from Google Fonts
             fontSrc: ["'self'", "https://fonts.gstatic.com"],      // Allow fonts from Google Fonts
-            scriptSrc: ["'self'", "https://cloud.umami.is", "https://vercel.live"],       // Allow scripts from own origin + Umami
+            scriptSrc: ["'self'", "https://cloud.umami.is"],       // Allow scripts from own origin + Umami
             imgSrc: ["'self'", "data:", "https://*"],              // Allow images from any origin
-            connectSrc: ["'self'", "https://cloud.umami.is", "https://api-gateway.umami.dev", "https://vercel.live"],      // Allow API calls + Umami
+            connectSrc: ["'self'", "https://cloud.umami.is", "https://vercel.live"],      // Allow API calls + Umami
             objectSrc: ["'none'"],                                 // Prevent loading of plugins
             upgradeInsecureRequests: [],                           // Upgrade insecure requests to HTTPS
         },
