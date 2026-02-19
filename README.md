@@ -17,6 +17,7 @@ A simple, fast, and secure URL shortener service built with Node.js, Express, an
 - [Node.js](https://nodejs.org/) (v14 or higher)
 - npm (Node Package Manager)
 - Turso account and database ([turso.tech](https://turso.tech))
+- Umami account and database ([umami.is](https://umami.is))
 
 ## Installation
 
@@ -40,6 +41,8 @@ A simple, fast, and secure URL shortener service built with Node.js, Express, an
     SMTP_USER=your_email
     SMTP_PASS=your_password
     ADMIN_EMAIL=your_admin_email
+
+    ANALYTICS_EXCLUDED_IPS=excluded_ip_01 excluded_ip_02 excluded_ip_03
     ```
 
 ## Local Development
@@ -93,4 +96,5 @@ MIT License
 - **Created by**: [Eduard Vallvé](https://eduvallve.com)
 - **Database**: [Turso](https://turso.tech)
 - **Hosting**: Vercel
+- **Statistics**: [Umami](https://umami.is)
 - **Development**: Built with AI assistance
